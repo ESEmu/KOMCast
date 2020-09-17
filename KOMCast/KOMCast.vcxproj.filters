@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Compression">
+      <UniqueIdentifier>{4cc2aabb-933c-479d-85c6-8f5b6f5d4812}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KOM">
+      <UniqueIdentifier>{bd664ae2-249f-4d2d-9c6c-0f899a465c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{04ea69e1-5a12-4966-9332-b77dea1e4e53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Console">
+      <UniqueIdentifier>{b6e6f867-22e7-46ea-900e-0f272c507dc4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Compression\Compression.cpp">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KOM\KOM.cpp">
+      <Filter>KOM</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\unluac.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Console\Args.cpp">
+      <Filter>Console</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Compression\Compression.h">
+      <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="KOM\KOM.h">
+      <Filter>KOM</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\unluac.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Console\Args.h">
+      <Filter>Console</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
