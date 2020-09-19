@@ -33,5 +33,5 @@ To unpack a KOM archive to a folder, and decompile its LUA files:
 ./KOMCast.exe -u data036_test2.kom -o ./out -d
 ```
 
-   [d3vsite]: <http://daringfireball.net>
+   [d3vsite]: <https://d3vsite.org>
    [esemuweb]: <https://esemuproject.org/>
