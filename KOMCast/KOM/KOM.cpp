@@ -99,7 +99,12 @@ KOM::Package KOM::Extractor::Process()
 
 			// Fetch data
 			_entrySlave->FileName.assign(_xmlNode->first_attribute("Name")->value(), _xmlNode->first_attribute("Name")->value_size());
-			_entrySlave->Checksum.assign(_xmlNode->first_attribute("CheckSum")->value(), _xmlNode->first_attribute("CheckSum")->value_size());
+
+			if (_xmlNode->first_attribute("Checksum") == NULL)
+				_entrySlave->Checksum.assign(_xmlNode->first_attribute("CheckSum")->value(), _xmlNode->first_attribute("CheckSum")->value_size());
+			else
+				_entrySlave->Checksum.assign(_xmlNode->first_attribute("Checksum")->value(), _xmlNode->first_attribute("Checksum")->value_size());
+
 			_entrySlave->FileTime.assign(_xmlNode->first_attribute("FileTime")->value(), _xmlNode->first_attribute("FileTime")->value_size());
 
 			_entrySlave->Size			= atoi(_xmlNode->first_attribute("Size")->value());
