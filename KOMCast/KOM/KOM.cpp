@@ -128,14 +128,81 @@ KOM::Package KOM::Extractor::Process()
 	}
 }
 
-inline std::string __xor(std::string _input) 
-{
-	char _key[12] = { 0x02, 0xAA, 0xF8, 0xC6, 0xDC, 0xAB, 0x47, 0x26, 0xEF, 0xBB, 0x00, 0x98 };
-	std::string _output;
-	_output.resize(_input.size());
+inline std::string __calcEncryptedData(std::string __input, char *__xorTable, unsigned int *__crc) {
+	
+	unsigned int _crc = *__crc;
+	for (auto i = 0; i < __input.length(); i++) {
+		_crc = (_crc >> 8) ^ KOM::CRC32Table[(_crc & 0xFF) ^ __input[i] ^ __xorTable[i % 20]];
+	}
+	__crc = &_crc;
+	return __input;
+}
 
-	for (auto i = 0; i < _input.length(); i++) 
-		_output[i] = _input[i] ^ _key[i % 12];
+inline std::string __calcAndDecrypt(std::string __input, char* __xorTable, unsigned int* __crc) {
+	unsigned int _crc = *__crc;
+	unsigned int _comp, _stored, _enc;
+	for (auto i = 0; i < __input.length(); i++) {
+		_comp = (_crc & 0xFF) ^ __xorTable[i % 20];
+		_stored = __input[i] ^ 0xFF ^ _comp;
+		_enc = KOM::CRC32Table[_stored];
+		__input[i + 1] = (unsigned char)((_enc & 0xFF) ^ _comp);
+		_crc = (_crc >> 8) ^ ((_enc & 0xFFFFFF00) | _stored);
+	}
+	__crc = &_crc;
+	return __input;
+}
+
+inline std::string __xor(char __algo, std::string _input, KOM::COUNTRY_CODE __keyComb = KOM::COUNTRY_CODE::DEFAULT )
+{
+	std::string _output;
+	switch (__algo){
+		case 0:
+			{
+				char _key[12] = { 
+					0x02, 0xAA, 0xF8, 0xC6, 
+					0xDC, 0xAB, 0x47, 0x26, 
+					0xEF, 0xBB, 0x00, 0x98
+				};
+				_output.resize(_input.size());
+				for (auto i = 0; i < _input.length(); i++)
+					_output[i] = _input[i] ^ _key[i % 12];
+			}
+		case 2:
+			{
+				
+				char *_key;
+				switch (__keyComb) {
+				case KOM::COUNTRY_CODE::INT:
+				case KOM::COUNTRY_CODE::TWHK:
+					{
+						//result xor from 0xa582142d
+						//91FE E1E5
+						//86CB 1D50
+						//F731 5E58
+						//FCBE CA82
+						//9178 AAF2
+						_key = new char[20]{ 
+							0xE5, 0xE1, 0xFE, 0x91, 
+							0x50, 0x1D, 0xCB, 0x86,
+							0x58, 0x5E, 0x31, 0xF7,
+							0x82, 0xCA, 0xBE, 0xFC,
+							0xF2, 0xAA, 0x78, 0x91
+						};
+						
+						unsigned int _crc = 0xFFFFFFFFU;
+						_output = __calcEncryptedData(_input, _key, &_crc);
+						_output = __calcAndDecrypt(_output, _key, &_crc);
+						break;
+					}
+				}
+
+			}
+		case 3:
+			{
+				break;
+			}
+	}
+	
 
 	return _output;
 }
@@ -155,22 +222,42 @@ std::string KOM::Extractor::PostProcess(tEntry* _entry)
 	_input.resize(_entry->CompressedSize);
 	this->m_stream->read(reinterpret_cast<char*>(&_input[0]), _entry->CompressedSize);
 
-	switch (_entry->Algorithm) 
-	{
-	case 0:
-	default:
-
-		auto _ret = zlib_decompress_mem(&_input[0], _entry->CompressedSize, &_output, _entry->Size);
-		_input.clear();
+	
 #if !defined(Z_OK)
 	#define Z_OK 0
 #endif
+
+	switch (_entry->Algorithm) 
+	{
+	case 0:
+
+		auto _ret = zlib_decompress_mem(&_input[0], _entry->CompressedSize, &_output, _entry->Size);
+		_input.clear();
 		if (_ret == Z_OK || _ret == _entry->Size)
 		{
 			std::string buffer;
 			buffer.assign(_output, _entry->Size);
 			
-			auto _ret = __xor(buffer);
+			auto _ret = __xor(_entry->Algorithm, buffer);
+			buffer.clear();
+			free(_output);
+
+			return _ret;
+		}
+
+		break;
+
+	case 2:
+		
+		auto _ret = zlib_compress_mem(&_input[0], _entry->CompressedSize, &_output, _entry->Size);
+		_input.clear();
+
+		if (_ret == Z_OK || _ret == _entry->Size)
+		{
+			std::string buffer;
+			buffer.assign(_output, _entry->Size);
+
+			auto _ret = __xor(_entry->Algorithm, buffer);
 			buffer.clear();
 			free(_output);
 
